@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
+import DateCalendar from '@/components/DateCalendar';
 import ItinerarySidebar from '@/components/ItinerarySidebar';
 import SummaryFooter from '@/components/SummaryFooter';
 import ChangeTracker from '@/components/ChangeTracker';
@@ -29,6 +30,7 @@ export default function Home() {
   const [showSendToAgent, setShowSendToAgent] = useState(false);
   const [agentRequests, setAgentRequests] = useState<AgentRequest[]>([]);
   const [activeRightPanel, setActiveRightPanel] = useState<'changes' | 'requests'>('changes');
+  const [selectedDay, setSelectedDay] = useState<number | undefined>();
 
   // Calculate pricing based on current selections
   const currentPricing = usePriceCalculator(itinerary);
@@ -143,6 +145,12 @@ export default function Home() {
         stats={mockTrip.stats}
       />
 
+      <DateCalendar
+        itinerary={itinerary}
+        selectedDay={selectedDay}
+        onSelectDay={setSelectedDay}
+      />
+
       <ResizablePanelGroup direction="horizontal" className="flex-1 overflow-hidden">
         {/* Left Panel: Itinerary Sidebar */}
         <ResizablePanel defaultSize={25} minSize={15} maxSize={40} className="min-w-[300px]">
@@ -221,7 +229,11 @@ export default function Home() {
             <div className="border-t-2 border-gray-300 p-4 bg-white">
               <button
                 onClick={() => setShowSendToAgent(true)}
-                className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                className="le-button-primary w-full flex items-center justify-center gap-2"
+                style={{
+                  padding: 'var(--le-space-3) var(--le-space-4)',
+                  boxShadow: 'var(--le-shadow-sm)'
+                }}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />

@@ -137,14 +137,16 @@ export default function ValidationWarningModal({
           <div className="flex items-center gap-3 w-full">
             <button
               onClick={onCancel}
-              className="flex-1 px-4 py-2.5 text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-100 border-2 border-gray-300 rounded-lg font-semibold transition-colors"
+              className="le-button-secondary flex-1"
+              style={{ padding: 'var(--le-space-3) var(--le-space-4)' }}
             >
               Cancel
             </button>
             {!hasErrors && (
               <button
                 onClick={onProceed}
-                className="flex-1 px-4 py-2.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg"
+                className="le-button-primary flex-1"
+                style={{ padding: 'var(--le-space-3) var(--le-space-4)' }}
               >
                 Proceed Anyway
               </button>
@@ -152,7 +154,20 @@ export default function ValidationWarningModal({
             {hasErrors && (
               <button
                 onClick={onCancel}
-                className="flex-1 px-4 py-2.5 text-white bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg"
+                className="flex-1"
+                style={{
+                  padding: 'var(--le-space-3) var(--le-space-4)',
+                  background: 'var(--le-error)',
+                  color: 'var(--le-white)',
+                  borderRadius: 'var(--le-radius-md)',
+                  fontWeight: 'var(--le-font-semibold)',
+                  fontSize: 'var(--le-text-sm)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background var(--le-transition-base)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#DC2626'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'var(--le-error)'}
               >
                 Go Back
               </button>

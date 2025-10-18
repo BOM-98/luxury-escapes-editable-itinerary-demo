@@ -190,18 +190,26 @@ export default function SendToAgentModal({
           <div className="flex items-center gap-3 w-full">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-100 border-2 border-gray-300 rounded-lg font-semibold transition-colors"
+              className="le-button-secondary flex-1"
+              style={{ padding: 'var(--le-space-3) var(--le-space-4)' }}
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
               disabled={!subject.trim() || !message.trim()}
-              className={`flex-1 px-4 py-2.5 text-white rounded-lg font-semibold transition-all shadow-md ${
+              className={`flex-1 ${
                 !subject.trim() || !message.trim()
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg'
+                  ? 'bg-gray-400 cursor-not-allowed text-white border-none'
+                  : 'le-button-primary'
               }`}
+              style={{
+                padding: 'var(--le-space-3) var(--le-space-4)',
+                borderRadius: 'var(--le-radius-md)',
+                fontWeight: 'var(--le-font-semibold)',
+                fontSize: 'var(--le-text-sm)',
+                transition: 'all var(--le-transition-base)'
+              }}
             >
               Send to Agent
             </button>

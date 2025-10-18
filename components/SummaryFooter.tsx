@@ -72,24 +72,29 @@ export default function SummaryFooter({ summary, onLockPrice }: SummaryFooterPro
   const priceDelta = summary.subtotal - summary.originalPricing.subtotal;
 
   return (
-    <div className="bg-white border-t-2 border-gray-300 shadow-lg">
+    <div className="bg-white border-t-2 border-gray-200 shadow-lg">
       {/* Main summary bar */}
-      <div className="px-6 py-4">
-        <div className="max-w-7xl mx-auto">
+      <div className="px-6 py-5">
+        <div className="w-full">
           {/* Change indicator */}
           {hasChanges && (
-            <div className="mb-3 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+            <div className="mb-4 flex items-center justify-between" style={{
+              background: 'var(--le-primary-light)',
+              border: '1px solid var(--le-primary)',
+              borderRadius: 'var(--le-radius-md)',
+              padding: 'var(--le-space-3) var(--le-space-4)'
+            }}>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: 'var(--le-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-sm font-medium text-blue-900">
+                <span className="text-sm font-medium" style={{ color: 'var(--le-primary-dark)' }}>
                   You've modified {summary.changeCount} {summary.changeCount === 1 ? 'item' : 'items'}
                 </span>
               </div>
               {priceDelta !== 0 && (
                 <div className="text-sm">
-                  <span className="text-blue-700">Price change: </span>
+                  <span style={{ color: 'var(--le-gray-700)' }}>Price change: </span>
                   <span className={`font-bold ${priceDelta > 0 ? 'text-red-600' : 'text-green-600'}`}>
                     {formatCurrency(priceDelta)}
                   </span>
@@ -98,68 +103,123 @@ export default function SummaryFooter({ summary, onLockPrice }: SummaryFooterPro
             </div>
           )}
 
-          <div className="flex items-start gap-6">
+          <div className="flex items-center gap-8">
             {/* Price summary grid */}
-            <div className="flex-1 grid grid-cols-4 gap-6">
+            <div className="flex-1 grid grid-cols-4 gap-8">
               {/* Subtotal */}
               <div>
-                <p className="text-sm text-gray-600 mb-1">Subtotal:</p>
-                <div className="flex items-baseline">
-                  <p className="text-2xl font-bold text-gray-900">
+                <p style={{
+                  fontSize: 'var(--le-text-sm)',
+                  color: 'var(--le-gray-600)',
+                  marginBottom: 'var(--le-space-2)',
+                  fontWeight: 'var(--le-font-medium)'
+                }}>Subtotal</p>
+                <div className="flex items-baseline gap-2">
+                  <p style={{
+                    fontSize: 'var(--le-text-2xl)',
+                    fontWeight: 'var(--le-font-bold)',
+                    color: 'var(--le-gray-900)'
+                  }}>
                     {formatCurrency(summary.subtotal)}
                   </p>
                   {formatDelta(summary.subtotal, summary.originalPricing.subtotal)}
                 </div>
                 {hasChanges && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p style={{
+                    fontSize: 'var(--le-text-xs)',
+                    color: 'var(--le-gray-500)',
+                    marginTop: 'var(--le-space-1)'
+                  }}>
                     Original: {formatCurrency(summary.originalPricing.subtotal)}
                   </p>
                 )}
               </div>
 
-              {/* Status Credits */}
+              {/* Status Credits (showing Société Points values) */}
               <div>
-                <p className="text-sm text-gray-600 mb-1">Status Credits</p>
-                <div className="flex items-baseline">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {formatPoints(summary.statusCredits)}
-                  </p>
-                  {formatDelta(summary.statusCredits, summary.originalPricing.statusCredits, false)}
-                </div>
-                {hasChanges && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Original: {formatPoints(summary.originalPricing.statusCredits)}
-                  </p>
-                )}
-              </div>
-
-              {/* Societé Points */}
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Societé Points</p>
-                <div className="flex items-baseline">
-                  <p className="text-2xl font-bold text-gray-900">
+                <p style={{
+                  fontSize: 'var(--le-text-sm)',
+                  color: 'var(--le-gray-600)',
+                  marginBottom: 'var(--le-space-2)',
+                  fontWeight: 'var(--le-font-medium)'
+                }}>Status Credits</p>
+                <div className="flex items-baseline gap-2">
+                  <p style={{
+                    fontSize: 'var(--le-text-2xl)',
+                    fontWeight: 'var(--le-font-bold)',
+                    color: 'var(--le-gray-900)'
+                  }}>
                     {formatPoints(summary.societePoints)}
                   </p>
                   {formatDelta(summary.societePoints, summary.originalPricing.societePoints, false)}
                 </div>
                 {hasChanges && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p style={{
+                    fontSize: 'var(--le-text-xs)',
+                    color: 'var(--le-gray-500)',
+                    marginTop: 'var(--le-space-1)'
+                  }}>
                     Original: {formatPoints(summary.originalPricing.societePoints)}
                   </p>
                 )}
               </div>
 
+              {/* Société Points (showing Status Credits values) */}
+              <div>
+                <p style={{
+                  fontSize: 'var(--le-text-sm)',
+                  color: 'var(--le-gray-600)',
+                  marginBottom: 'var(--le-space-2)',
+                  fontWeight: 'var(--le-font-medium)'
+                }}>Société Points</p>
+                <div className="flex items-baseline gap-2">
+                  <p style={{
+                    fontSize: 'var(--le-text-2xl)',
+                    fontWeight: 'var(--le-font-bold)',
+                    color: 'var(--le-gray-900)'
+                  }}>
+                    {formatPoints(summary.statusCredits)}
+                  </p>
+                  {formatDelta(summary.statusCredits, summary.originalPricing.statusCredits, false)}
+                </div>
+                {hasChanges && (
+                  <p style={{
+                    fontSize: 'var(--le-text-xs)',
+                    color: 'var(--le-gray-500)',
+                    marginTop: 'var(--le-space-1)'
+                  }}>
+                    Original: {formatPoints(summary.originalPricing.statusCredits)}
+                  </p>
+                )}
+              </div>
+
               {/* Total */}
-              <div className="border-l-2 border-gray-300 pl-6">
-                <p className="text-sm text-gray-600 mb-1">Total (incl. taxes & fees):</p>
-                <div className="flex items-baseline">
-                  <p className="text-2xl font-bold text-blue-600">
+              <div style={{
+                borderLeft: '2px solid var(--le-gray-300)',
+                paddingLeft: 'var(--le-space-6)'
+              }}>
+                <p style={{
+                  fontSize: 'var(--le-text-sm)',
+                  color: 'var(--le-gray-600)',
+                  marginBottom: 'var(--le-space-2)',
+                  fontWeight: 'var(--le-font-medium)'
+                }}>Total (incl. taxes & fees)</p>
+                <div className="flex items-baseline gap-2">
+                  <p style={{
+                    fontSize: 'var(--le-text-2xl)',
+                    fontWeight: 'var(--le-font-bold)',
+                    color: 'var(--le-gray-900)'
+                  }}>
                     {formatCurrency(summary.total || 0)}
                   </p>
                   {summary.total && summary.originalPricing.total && formatDelta(summary.total, summary.originalPricing.total)}
                 </div>
                 {summary.taxes && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p style={{
+                    fontSize: 'var(--le-text-xs)',
+                    color: 'var(--le-gray-500)',
+                    marginTop: 'var(--le-space-1)'
+                  }}>
                     Taxes: {formatCurrency(summary.taxes)} • Fees: {formatCurrency(summary.fees || 0)}
                   </p>
                 )}
@@ -171,7 +231,7 @@ export default function SummaryFooter({ summary, onLockPrice }: SummaryFooterPro
               {/* View Breakdown button */}
               <button
                 onClick={() => setShowBreakdown(!showBreakdown)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="le-button-secondary flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -183,7 +243,7 @@ export default function SummaryFooter({ summary, onLockPrice }: SummaryFooterPro
               {summary.quoteExpiresAt && !summary.isPriceLocked && onLockPrice && (
                 <button
                   onClick={onLockPrice}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="le-button-primary flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -233,21 +293,15 @@ export default function SummaryFooter({ summary, onLockPrice }: SummaryFooterPro
               <div className="flex gap-2">
                 <button
                   onClick={() => setBreakdownView('category')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                    breakdownView === 'category'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className={breakdownView === 'category' ? 'le-button-primary' : 'le-button-secondary'}
+                  style={{ padding: 'var(--le-space-2) var(--le-space-3)' }}
                 >
                   By Category
                 </button>
                 <button
                   onClick={() => setBreakdownView('day')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                    breakdownView === 'day'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className={breakdownView === 'day' ? 'le-button-primary' : 'le-button-secondary'}
+                  style={{ padding: 'var(--le-space-2) var(--le-space-3)' }}
                 >
                   By Day
                 </button>
@@ -332,7 +386,7 @@ export default function SummaryFooter({ summary, onLockPrice }: SummaryFooterPro
                 )}
                 <div className="flex items-center justify-between pt-2 border-t border-gray-200">
                   <span className="font-bold text-gray-900">Total</span>
-                  <span className="text-xl font-bold text-indigo-600">{formatCurrency(summary.total || 0)}</span>
+                  <span className="text-xl font-bold" style={{ color: 'var(--le-gray-900)' }}>{formatCurrency(summary.total || 0)}</span>
                 </div>
               </div>
             </div>

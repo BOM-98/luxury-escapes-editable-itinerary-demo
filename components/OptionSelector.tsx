@@ -293,18 +293,25 @@ export default function OptionSelector({
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+              className="le-button-secondary"
+              style={{ padding: 'var(--le-space-2) var(--le-space-4)' }}
             >
               Cancel
             </button>
             <button
               onClick={handleSelectOption}
               disabled={selectedOptionId === activitySlot.selectedOptionId}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                selectedOptionId === activitySlot.selectedOptionId
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
+              className={selectedOptionId === activitySlot.selectedOptionId
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'le-button-primary'
+              }
+              style={{
+                padding: 'var(--le-space-2) var(--le-space-6)',
+                borderRadius: 'var(--le-radius-md)',
+                fontWeight: 'var(--le-font-medium)',
+                fontSize: 'var(--le-text-sm)',
+                transition: 'all var(--le-transition-base)'
+              }}
             >
               {selectedOptionId === activitySlot.selectedOptionId ? 'Already Selected' : 'Confirm Selection'}
             </button>

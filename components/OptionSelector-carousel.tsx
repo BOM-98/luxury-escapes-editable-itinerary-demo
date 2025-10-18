@@ -285,11 +285,15 @@ export default function OptionSelector({
                           <button
                             onClick={() => handleSelectOption(option.id)}
                             disabled={isCurrentSelection}
-                            className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                            className={`w-full ${
                               isCurrentSelection
                                 ? 'bg-green-100 text-green-700 cursor-default border-2 border-green-500'
-                                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                                : 'le-button-primary'
                             }`}
+                            style={{
+                              padding: 'var(--le-space-3)',
+                              borderRadius: isCurrentSelection ? 'var(--le-radius-md)' : undefined
+                            }}
                           >
                             {isCurrentSelection ? '✓ Currently Selected' : 'Select This Option'}
                           </button>
