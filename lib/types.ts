@@ -166,6 +166,25 @@ export interface AgentRequest {
   };
 }
 
+// Version History Types
+export interface ItineraryVersion {
+  id: string;
+  timestamp: Date;
+  itinerary: DayItinerary[];
+  summary: TripSummary;
+  label?: string; // Custom label like "After hotel upgrade"
+  note?: string; // Optional description
+  isAutoSave?: boolean; // Distinguish auto-saves from manual saves
+  changesSinceLastVersion?: string[]; // Summary of what changed
+}
+
+export interface VersionHistoryState {
+  versions: ItineraryVersion[];
+  currentVersionId: string;
+  autoSaveEnabled: boolean;
+  lastAutoSaveAt?: Date;
+}
+
 // Legacy type for backward compatibility
 export interface Activity {
   id: string;

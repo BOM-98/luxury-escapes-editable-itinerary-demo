@@ -9,9 +9,12 @@ import SummaryFooter from '@/components/SummaryFooter';
 import ChangeTracker from '@/components/ChangeTracker';
 import SendToAgentModal from '@/components/SendToAgentModal';
 import AgentRequestsPanel from '@/components/AgentRequestsPanel';
+import VersionHistory from '@/components/VersionHistory';
+import VersionComparisonModal from '@/components/VersionComparisonModal';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { mockTrip } from '@/lib/mockData';
 import { usePriceCalculator } from '@/lib/hooks/usePriceCalculator';
+import { useVersionHistory } from '@/hooks/useVersionHistory';
 import { DayItinerary, AgentRequest } from '@/lib/types';
 
 // Dynamically import map component to avoid SSR issues with Leaflet
@@ -30,11 +33,45 @@ export default function Home() {
   const [itinerary, setItinerary] = useState<DayItinerary[]>(mockTrip.itinerary);
   const [showSendToAgent, setShowSendToAgent] = useState(false);
   const [agentRequests, setAgentRequests] = useState<AgentRequest[]>([]);
-  const [activeRightPanel, setActiveRightPanel] = useState<'changes' | 'requests'>('changes');
+  const [activeRightPanel, setActiveRightPanel] = useState<'changes' | 'requests' | 'history'>('changes');
   const [selectedDay, setSelectedDay] = useState<number | undefined>();
+  const [showVersionComparison, setShowVersionComparison] = useState(false);
+  const [comparisonData, setComparisonData] = useState<any>(null);
 
   // Calculate pricing based on current selections
   const currentPricing = usePriceCalculator(itinerary);
+
+  // Quote expiry: 24 hours from now
+  const quoteExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  const [isPriceLocked, setIsPriceLocked] = useState(false);
+  const [priceLockedAt, setPriceLockedAt] = useState<Date | undefined>();
+
+  // Create enhanced summary with original pricing for comparison
+  const changeCount = itinerary.reduce((count, day) =>
+    count + day.activities.filter(slot =>
+      slot.selectedOptionId !== slot.agentRecommendedOptionId
+    ).length,
+    0
+  );
+
+  const summary = {
+    ...currentPricing,
+    originalPricing: mockTrip.summary.originalPricing,
+    changeCount,
+    quoteExpiresAt,
+    isPriceLocked,
+    priceLockedAt,
+  };
+
+  // Initialize version history
+  const versionHistory = useVersionHistory({
+    itinerary,
+    summary,
+    onRestore: (restoredItinerary) => {
+      setItinerary(restoredItinerary);
+    },
+  });
 
   const handleLocationClick = (coordinates: [number, number]) => {
     setSelectedLocation(coordinates);
@@ -111,32 +148,17 @@ export default function Home() {
     }, 5000);
   };
 
-  // Create enhanced summary with original pricing for comparison
-  const changeCount = itinerary.reduce((count, day) =>
-    count + day.activities.filter(slot =>
-      slot.selectedOptionId !== slot.agentRecommendedOptionId
-    ).length,
-    0
-  );
-
-  // Quote expiry: 24 hours from now
-  const quoteExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-  const [isPriceLocked, setIsPriceLocked] = useState(false);
-  const [priceLockedAt, setPriceLockedAt] = useState<Date | undefined>();
-
   const handleLockPrice = () => {
     setIsPriceLocked(true);
     setPriceLockedAt(new Date());
   };
 
-  const summary = {
-    ...currentPricing,
-    originalPricing: mockTrip.summary.originalPricing,
-    changeCount,
-    quoteExpiresAt,
-    isPriceLocked,
-    priceLockedAt,
+  const handleCompareVersions = (versionId1: string, versionId2: string) => {
+    const comparison = versionHistory.compareVersions(versionId1, versionId2);
+    if (comparison) {
+      setComparisonData(comparison);
+      setShowVersionComparison(true);
+    }
   };
 
   const priceDelta = currentPricing.subtotal - mockTrip.summary.originalPricing.subtotal;
@@ -182,53 +204,84 @@ export default function Home() {
 
         <ResizableHandle withHandle />
 
-        {/* Right Panel: Changes & Agent Requests */}
+        {/* Right Panel: Changes, Agent Requests & Version History */}
         <ResizablePanel defaultSize={25} minSize={20} maxSize={40} className="min-w-[300px]">
           <div className="h-full bg-gray-50 border-l-2 border-gray-300 flex flex-col">
             {/* Panel Tabs */}
             <div className="flex border-b-2 border-gray-300">
               <button
                 onClick={() => setActiveRightPanel('changes')}
-                className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
+                className={`flex-1 px-3 py-3 text-xs font-semibold transition-colors ${
                   activeRightPanel === 'changes'
                     ? 'bg-white text-blue-600 border-b-2 border-blue-600 -mb-0.5'
                     : 'bg-gray-100 text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Your Changes
+                Changes
                 {changeCount > 0 && (
-                  <span className="ml-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
+                  <span className="ml-1 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full">
                     {changeCount}
                   </span>
                 )}
               </button>
               <button
                 onClick={() => setActiveRightPanel('requests')}
-                className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
+                className={`flex-1 px-3 py-3 text-xs font-semibold transition-colors ${
                   activeRightPanel === 'requests'
                     ? 'bg-white text-indigo-600 border-b-2 border-indigo-600 -mb-0.5'
                     : 'bg-gray-100 text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Agent Requests
+                Requests
                 {agentRequests.length > 0 && (
-                  <span className="ml-2 bg-indigo-600 text-white text-xs px-2 py-0.5 rounded-full">
+                  <span className="ml-1 bg-indigo-600 text-white text-xs px-1.5 py-0.5 rounded-full">
                     {agentRequests.length}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveRightPanel('history')}
+                className={`flex-1 px-3 py-3 text-xs font-semibold transition-colors ${
+                  activeRightPanel === 'history'
+                    ? 'bg-white text-teal-600 border-b-2 border-teal-600 -mb-0.5'
+                    : 'bg-gray-100 text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                History
+                {versionHistory.versions.length > 0 && (
+                  <span className="ml-1 bg-teal-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {versionHistory.versions.length}
                   </span>
                 )}
               </button>
             </div>
 
             {/* Panel Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto">
               {activeRightPanel === 'changes' ? (
-                <ChangeTracker
-                  itinerary={itinerary}
-                  onRevertItem={handleRevertItem}
-                  onResetAll={handleResetAll}
-                />
+                <div className="p-6">
+                  <ChangeTracker
+                    itinerary={itinerary}
+                    onRevertItem={handleRevertItem}
+                    onResetAll={handleResetAll}
+                  />
+                </div>
+              ) : activeRightPanel === 'requests' ? (
+                <div className="p-6">
+                  <AgentRequestsPanel requests={agentRequests} />
+                </div>
               ) : (
-                <AgentRequestsPanel requests={agentRequests} />
+                <VersionHistory
+                  versions={versionHistory.versions}
+                  currentVersionId={versionHistory.currentVersionId}
+                  onRevertToVersion={versionHistory.revertToVersion}
+                  onDeleteVersion={versionHistory.deleteVersion}
+                  onUpdateLabel={versionHistory.updateVersionLabel}
+                  onCompareVersions={handleCompareVersions}
+                  onCreateVersion={(label, note) => versionHistory.createVersion(label, note, false)}
+                  autoSaveEnabled={versionHistory.autoSaveEnabled}
+                  lastAutoSaveAt={versionHistory.lastAutoSaveAt}
+                />
               )}
             </div>
 
@@ -262,6 +315,16 @@ export default function Home() {
         itinerary={itinerary}
         modifiedCount={changeCount}
         priceDelta={priceDelta}
+      />
+
+      {/* Version Comparison Modal */}
+      <VersionComparisonModal
+        isOpen={showVersionComparison}
+        onClose={() => {
+          setShowVersionComparison(false);
+          setComparisonData(null);
+        }}
+        comparison={comparisonData}
       />
     </div>
   );
