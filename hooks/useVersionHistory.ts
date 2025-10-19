@@ -12,7 +12,7 @@ export function useVersionHistory({ itinerary, summary, onRestore }: UseVersionH
   const [currentVersionId, setCurrentVersionId] = useState<string>('initial');
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const [lastAutoSaveAt, setLastAutoSaveAt] = useState<Date | undefined>();
-  const autoSaveTimerRef = useRef<NodeJS.Timeout>();
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Generate unique version ID
   const generateVersionId = useCallback(() => {
