@@ -38,6 +38,9 @@ export default function Home() {
   const [showVersionComparison, setShowVersionComparison] = useState(false);
   const [comparisonData, setComparisonData] = useState<any>(null);
 
+  // Mobile state: which panel is active on mobile
+  const [activeMobilePanel, setActiveMobilePanel] = useState<'itinerary' | 'map' | 'details'>('map');
+
   // Calculate pricing based on current selections
   const currentPricing = usePriceCalculator(itinerary);
 
@@ -178,31 +181,33 @@ export default function Home() {
         onSelectDay={setSelectedDay}
       />
 
-      <ResizablePanelGroup direction="horizontal" className="flex-1 overflow-hidden">
-        {/* Left Panel: Itinerary Sidebar */}
-        <ResizablePanel defaultSize={25} minSize={15} maxSize={40} className="min-w-[300px]">
-          <ItinerarySidebar
-            itinerary={itinerary}
-            onLocationClick={handleLocationClick}
-            onSelectOption={handleSelectOption}
-            onActivityHover={handleActivityHover}
-          />
-        </ResizablePanel>
-
-        <ResizableHandle withHandle />
-
-        {/* Center Panel: Map */}
-        <ResizablePanel defaultSize={50} minSize={30}>
-          <div className="h-full w-full relative">
-            <TripMap
+      {/* Desktop Layout - 3 Panel Resizable */}
+      <div className="hidden md:flex flex-1 overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="flex-1 overflow-hidden">
+          {/* Left Panel: Itinerary Sidebar */}
+          <ResizablePanel defaultSize={25} minSize={15} maxSize={40} className="min-w-[300px]">
+            <ItinerarySidebar
               itinerary={itinerary}
-              selectedLocation={selectedLocation}
-              hoveredLocation={hoveredLocation}
+              onLocationClick={handleLocationClick}
+              onSelectOption={handleSelectOption}
+              onActivityHover={handleActivityHover}
             />
-          </div>
-        </ResizablePanel>
+          </ResizablePanel>
 
-        <ResizableHandle withHandle />
+          <ResizableHandle withHandle />
+
+          {/* Center Panel: Map */}
+          <ResizablePanel defaultSize={50} minSize={30}>
+            <div className="h-full w-full relative">
+              <TripMap
+                itinerary={itinerary}
+                selectedLocation={selectedLocation}
+                hoveredLocation={hoveredLocation}
+              />
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
 
         {/* Right Panel: Changes, Agent Requests & Version History */}
         <ResizablePanel defaultSize={25} minSize={20} maxSize={40} className="min-w-[300px]">
@@ -304,6 +309,187 @@ export default function Home() {
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
+      </div>
+
+      {/* Mobile Layout - Tabbed Single Panel */}
+      <div className="md:hidden flex flex-col flex-1 overflow-hidden relative">
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-hidden">
+          {/* Itinerary Panel */}
+          {activeMobilePanel === 'itinerary' && (
+            <div className="h-full overflow-hidden">
+              <ItinerarySidebar
+                itinerary={itinerary}
+                onLocationClick={(coords) => {
+                  handleLocationClick(coords);
+                  setActiveMobilePanel('map');
+                }}
+                onSelectOption={handleSelectOption}
+                onActivityHover={handleActivityHover}
+              />
+            </div>
+          )}
+
+          {/* Map Panel */}
+          {activeMobilePanel === 'map' && (
+            <div className="h-full w-full relative">
+              <TripMap
+                itinerary={itinerary}
+                selectedLocation={selectedLocation}
+                hoveredLocation={hoveredLocation}
+              />
+            </div>
+          )}
+
+          {/* Details Panel (Changes, Requests, History) */}
+          {activeMobilePanel === 'details' && (
+            <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
+              {/* Sub-tabs for Details */}
+              <div className="flex border-b-2 border-gray-300 bg-white">
+                <button
+                  onClick={() => setActiveRightPanel('changes')}
+                  className={`flex-1 px-3 py-3 text-xs font-semibold transition-colors ${
+                    activeRightPanel === 'changes'
+                      ? 'bg-white text-blue-600 border-b-2 border-blue-600 -mb-0.5'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  Changes
+                  {changeCount > 0 && (
+                    <span className="ml-1 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+                      {changeCount}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveRightPanel('requests')}
+                  className={`flex-1 px-3 py-3 text-xs font-semibold transition-colors ${
+                    activeRightPanel === 'requests'
+                      ? 'bg-white text-indigo-600 border-b-2 border-indigo-600 -mb-0.5'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  Requests
+                  {agentRequests.length > 0 && (
+                    <span className="ml-1 bg-indigo-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+                      {agentRequests.length}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveRightPanel('history')}
+                  className={`flex-1 px-3 py-3 text-xs font-semibold transition-colors ${
+                    activeRightPanel === 'history'
+                      ? 'bg-white text-teal-600 border-b-2 border-teal-600 -mb-0.5'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  History
+                  {versionHistory.versions.length > 0 && (
+                    <span className="ml-1 bg-teal-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+                      {versionHistory.versions.length}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              {/* Panel Content */}
+              <div className="flex-1 overflow-y-auto">
+                {activeRightPanel === 'changes' ? (
+                  <div className="p-4">
+                    <ChangeTracker
+                      itinerary={itinerary}
+                      onRevertItem={handleRevertItem}
+                      onResetAll={handleResetAll}
+                    />
+                  </div>
+                ) : activeRightPanel === 'requests' ? (
+                  <div className="p-4">
+                    <AgentRequestsPanel requests={agentRequests} />
+                  </div>
+                ) : (
+                  <VersionHistory
+                    versions={versionHistory.versions}
+                    currentVersionId={versionHistory.currentVersionId}
+                    onRevertToVersion={versionHistory.revertToVersion}
+                    onDeleteVersion={versionHistory.deleteVersion}
+                    onUpdateLabel={versionHistory.updateVersionLabel}
+                    onCompareVersions={handleCompareVersions}
+                    onCreateVersion={(label, note) => versionHistory.createVersion(label, note, false)}
+                    autoSaveEnabled={versionHistory.autoSaveEnabled}
+                    lastAutoSaveAt={versionHistory.lastAutoSaveAt}
+                  />
+                )}
+              </div>
+
+              {/* Send to Agent Button - Mobile */}
+              <div className="border-t-2 border-gray-300 p-3 bg-white">
+                <button
+                  onClick={() => setShowSendToAgent(true)}
+                  className="le-button-primary w-full flex items-center justify-center gap-2"
+                  style={{
+                    padding: 'var(--le-space-3)',
+                    fontSize: 'var(--le-text-sm)'
+                  }}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  Send to Agent
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Bottom Navigation */}
+        <div className="flex border-t-2 border-gray-300 bg-white safe-area-inset-bottom">
+          <button
+            onClick={() => setActiveMobilePanel('itinerary')}
+            className={`flex-1 flex flex-col items-center justify-center py-3 transition-colors ${
+              activeMobilePanel === 'itinerary'
+                ? 'text-teal-600'
+                : 'text-gray-500'
+            }`}
+          >
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span className="text-xs font-medium">Itinerary</span>
+          </button>
+          <button
+            onClick={() => setActiveMobilePanel('map')}
+            className={`flex-1 flex flex-col items-center justify-center py-3 transition-colors ${
+              activeMobilePanel === 'map'
+                ? 'text-teal-600'
+                : 'text-gray-500'
+            }`}
+          >
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+            <span className="text-xs font-medium">Map</span>
+          </button>
+          <button
+            onClick={() => setActiveMobilePanel('details')}
+            className={`flex-1 flex flex-col items-center justify-center py-3 transition-colors relative ${
+              activeMobilePanel === 'details'
+                ? 'text-teal-600'
+                : 'text-gray-500'
+            }`}
+          >
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-xs font-medium">Details</span>
+            {(changeCount > 0 || agentRequests.length > 0) && (
+              <span className="absolute top-1 right-6 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                {changeCount + agentRequests.length}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
 
       <SummaryFooter summary={summary} onLockPrice={handleLockPrice} />
 
