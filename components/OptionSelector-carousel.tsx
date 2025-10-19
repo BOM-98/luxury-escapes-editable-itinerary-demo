@@ -109,9 +109,19 @@ export default function OptionSelector({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden p-0">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b">
-          <DialogTitle className="text-xl font-bold">{activitySlot.title}</DialogTitle>
-          <p className="text-sm text-gray-600 mt-1">
+        <DialogHeader className="px-6 pt-6 pb-4" style={{ borderBottom: '1px solid var(--le-gray-200)' }}>
+          <DialogTitle style={{
+            fontSize: 'var(--le-text-xl)',
+            fontWeight: 'var(--le-font-bold)',
+            color: 'var(--le-gray-900)'
+          }}>
+            {activitySlot.title}
+          </DialogTitle>
+          <p style={{
+            fontSize: 'var(--le-text-sm)',
+            color: 'var(--le-gray-600)',
+            marginTop: 'var(--le-space-1)'
+          }}>
             Option {current + 1} of {activitySlot.options.length}
           </p>
         </DialogHeader>
@@ -135,9 +145,12 @@ export default function OptionSelector({
                 return (
                   <CarouselItem key={option.id} className="pl-2 basis-full">
                     <div className="px-2">
-                      <div className={`border-2 rounded-xl overflow-hidden ${
-                        isCurrentSelection ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-white'
-                      }`}>
+                      <div style={{
+                        border: isCurrentSelection ? '2px solid var(--le-primary)' : '2px solid var(--le-gray-200)',
+                        background: isCurrentSelection ? '#E6F7F5' : 'var(--le-white)',
+                        borderRadius: 'var(--le-radius-lg)',
+                        overflow: 'hidden'
+                      }}>
                         {/* Image */}
                         {option.photos[0] && (
                           <div className="relative h-48 bg-gray-200">
@@ -149,18 +162,42 @@ export default function OptionSelector({
                             {/* Badges */}
                             <div className="absolute top-3 left-3 flex flex-col gap-2">
                               {isAgentPick && (
-                                <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                                <span style={{
+                                  background: '#137333',
+                                  color: 'var(--le-white)',
+                                  padding: 'var(--le-space-1) var(--le-space-3)',
+                                  borderRadius: 'var(--le-radius-full)',
+                                  fontSize: 'var(--le-text-xs)',
+                                  fontWeight: 'var(--le-font-semibold)',
+                                  boxShadow: 'var(--le-shadow-lg)'
+                                }}>
                                   ⭐ Agent's Pick
                                 </span>
                               )}
                               {isCurrentSelection && (
-                                <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                                <span style={{
+                                  background: 'var(--le-primary)',
+                                  color: 'var(--le-white)',
+                                  padding: 'var(--le-space-1) var(--le-space-3)',
+                                  borderRadius: 'var(--le-radius-full)',
+                                  fontSize: 'var(--le-text-xs)',
+                                  fontWeight: 'var(--le-font-semibold)',
+                                  boxShadow: 'var(--le-shadow-lg)'
+                                }}>
                                   ✓ Currently Selected
                                 </span>
                               )}
                             </div>
                             {option.availability === 'limited' && (
-                              <div className="absolute top-3 right-3 bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                              <div className="absolute top-3 right-3" style={{
+                                background: '#FEF3C7',
+                                color: '#92400E',
+                                padding: 'var(--le-space-1) var(--le-space-3)',
+                                borderRadius: 'var(--le-radius-full)',
+                                fontSize: 'var(--le-text-xs)',
+                                fontWeight: 'var(--le-font-semibold)',
+                                boxShadow: 'var(--le-shadow-lg)'
+                              }}>
                                 Limited Availability
                               </div>
                             )}
@@ -174,16 +211,43 @@ export default function OptionSelector({
 
                         {/* Agent's Note - only show on agent's pick */}
                         {isAgentPick && activitySlot.notes && (
-                          <div className="bg-indigo-50 border-l-4 border-indigo-600 p-4 mx-5 mt-4">
+                          <div style={{
+                            background: '#E6F4EA',
+                            borderLeft: '4px solid #137333',
+                            padding: 'var(--le-space-4)',
+                            margin: '0 var(--le-space-5)',
+                            marginTop: 'var(--le-space-4)'
+                          }}>
                             <div className="flex items-start gap-3">
-                              <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                              <div style={{
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: 'var(--le-radius-full)',
+                                background: '#137333',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--le-white)',
+                                fontSize: 'var(--le-text-sm)',
+                                fontWeight: 'var(--le-font-bold)',
+                                flexShrink: 0
+                              }}>
                                 {activitySlot.addedBy?.name?.[0] || 'A'}
                               </div>
                               <div className="flex-1">
-                                <p className="text-xs font-semibold text-indigo-900 mb-1">
+                                <p style={{
+                                  fontSize: 'var(--le-text-xs)',
+                                  fontWeight: 'var(--le-font-semibold)',
+                                  color: '#137333',
+                                  marginBottom: 'var(--le-space-1)'
+                                }}>
                                   {activitySlot.addedBy?.name || 'Your Travel Agent'}'s Note
                                 </p>
-                                <p className="text-sm text-indigo-800 italic">
+                                <p style={{
+                                  fontSize: 'var(--le-text-sm)',
+                                  color: '#0F5323',
+                                  fontStyle: 'italic'
+                                }}>
                                   "{activitySlot.notes}"
                                 </p>
                               </div>
@@ -197,35 +261,65 @@ export default function OptionSelector({
                           <p className="text-sm text-gray-600 mb-4 leading-relaxed">{option.description}</p>
 
                           {/* Pricing with Deltas */}
-                          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-4">
+                          <div style={{
+                            background: 'var(--le-gray-50)',
+                            borderRadius: 'var(--le-radius-lg)',
+                            padding: 'var(--le-space-4)',
+                            marginBottom: 'var(--le-space-4)',
+                            border: '1px solid var(--le-gray-200)'
+                          }}>
                             <div className="flex items-baseline justify-between mb-2">
                               <div>
-                                <span className="text-3xl font-bold text-gray-900">
+                                <span style={{
+                                  fontSize: 'var(--le-text-3xl)',
+                                  fontWeight: 'var(--le-font-bold)',
+                                  color: 'var(--le-gray-900)'
+                                }}>
                                   ${option.price.toLocaleString()}
                                 </span>
                                 {delta.price !== 0 && (
-                                  <span className="ml-3 text-sm">
+                                  <span className="ml-3" style={{ fontSize: 'var(--le-text-sm)' }}>
                                     {formatDelta(delta.price)}
                                   </span>
                                 )}
                               </div>
                             </div>
-                            <div className="flex items-center gap-4 text-sm">
+                            <div className="flex items-center gap-4" style={{ fontSize: 'var(--le-text-sm)' }}>
                               <div>
-                                <span className="font-semibold text-gray-700">+{option.statusCredits}</span>
-                                <span className="text-gray-500 ml-1">credits</span>
+                                <span style={{
+                                  fontWeight: 'var(--le-font-semibold)',
+                                  color: 'var(--le-gray-700)'
+                                }}>
+                                  +{option.statusCredits}
+                                </span>
+                                <span style={{
+                                  color: 'var(--le-gray-500)',
+                                  marginLeft: 'var(--le-space-1)'
+                                }}>
+                                  credits
+                                </span>
                                 {delta.credits !== 0 && (
-                                  <span className="ml-2 text-xs">
+                                  <span className="ml-2" style={{ fontSize: 'var(--le-text-xs)' }}>
                                     {formatDelta(delta.credits, '')}
                                   </span>
                                 )}
                               </div>
-                              <span className="text-gray-400">•</span>
+                              <span style={{ color: 'var(--le-gray-400)' }}>•</span>
                               <div>
-                                <span className="font-semibold text-gray-700">+{option.societePoints}</span>
-                                <span className="text-gray-500 ml-1">pts</span>
+                                <span style={{
+                                  fontWeight: 'var(--le-font-semibold)',
+                                  color: 'var(--le-gray-700)'
+                                }}>
+                                  +{option.societePoints}
+                                </span>
+                                <span style={{
+                                  color: 'var(--le-gray-500)',
+                                  marginLeft: 'var(--le-space-1)'
+                                }}>
+                                  pts
+                                </span>
                                 {delta.points !== 0 && (
-                                  <span className="ml-2 text-xs">
+                                  <span className="ml-2" style={{ fontSize: 'var(--le-text-xs)' }}>
                                     {formatDelta(delta.points, '')}
                                   </span>
                                 )}
@@ -240,7 +334,13 @@ export default function OptionSelector({
                                 {option.highlights.map((highlight, idx) => (
                                   <span
                                     key={idx}
-                                    className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full"
+                                    style={{
+                                      fontSize: 'var(--le-text-xs)',
+                                      background: '#E6F7F5',
+                                      color: 'var(--le-primary)',
+                                      padding: 'var(--le-space-1) var(--le-space-2)',
+                                      borderRadius: 'var(--le-radius-full)'
+                                    }}
                                   >
                                     ✨ {highlight}
                                   </span>
@@ -251,18 +351,32 @@ export default function OptionSelector({
 
                           {/* Inclusions */}
                           <div className="mb-4">
-                            <p className="text-xs font-bold text-gray-900 mb-2">What's Included:</p>
+                            <p style={{
+                              fontSize: 'var(--le-text-xs)',
+                              fontWeight: 'var(--le-font-bold)',
+                              color: 'var(--le-gray-900)',
+                              marginBottom: 'var(--le-space-2)'
+                            }}>
+                              What's Included:
+                            </p>
                             <div className="space-y-1">
                               {option.inclusions.slice(0, 4).map((inclusion, idx) => (
-                                <div key={idx} className="flex items-start gap-2 text-xs text-gray-700">
-                                  <svg className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div key={idx} className="flex items-start gap-2" style={{
+                                  fontSize: 'var(--le-text-xs)',
+                                  color: 'var(--le-gray-700)'
+                                }}>
+                                  <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--le-success)' }}>
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                   </svg>
                                   <span>{inclusion}</span>
                                 </div>
                               ))}
                               {option.inclusions.length > 4 && (
-                                <p className="text-xs text-blue-600 ml-6">
+                                <p style={{
+                                  fontSize: 'var(--le-text-xs)',
+                                  color: 'var(--le-primary)',
+                                  marginLeft: '24px'
+                                }}>
                                   +{option.inclusions.length - 4} more included
                                 </p>
                               )}
@@ -285,14 +399,27 @@ export default function OptionSelector({
                           <button
                             onClick={() => handleSelectOption(option.id)}
                             disabled={isCurrentSelection}
-                            className={`w-full ${
-                              isCurrentSelection
-                                ? 'bg-green-100 text-green-700 cursor-default border-2 border-green-500'
-                                : 'le-button-primary'
-                            }`}
+                            className="w-full"
                             style={{
                               padding: 'var(--le-space-3)',
-                              borderRadius: isCurrentSelection ? 'var(--le-radius-md)' : undefined
+                              background: isCurrentSelection ? '#E6F7F5' : 'var(--le-charcoal)',
+                              color: isCurrentSelection ? 'var(--le-primary)' : 'var(--le-white)',
+                              border: isCurrentSelection ? '2px solid var(--le-primary)' : 'none',
+                              borderRadius: 'var(--le-radius-md)',
+                              fontWeight: 'var(--le-font-semibold)',
+                              fontSize: 'var(--le-text-sm)',
+                              cursor: isCurrentSelection ? 'default' : 'pointer',
+                              transition: 'background var(--le-transition-base)'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isCurrentSelection) {
+                                e.currentTarget.style.background = 'var(--le-charcoal-light)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isCurrentSelection) {
+                                e.currentTarget.style.background = 'var(--le-charcoal)';
+                              }
                             }}
                           >
                             {isCurrentSelection ? '✓ Currently Selected' : 'Select This Option'}
@@ -315,9 +442,11 @@ export default function OptionSelector({
                         {Array.from({ length: totalItems }).map((_, idx) => (
                           <button
                             key={idx}
-                            className={`h-1.5 rounded-full transition-all ${
-                              idx === current ? 'w-6 bg-blue-600' : 'w-1.5 bg-gray-300'
-                            }`}
+                            className="h-1.5 rounded-full transition-all"
+                            style={{
+                              width: idx === current ? '24px' : '6px',
+                              background: idx === current ? 'var(--le-charcoal)' : 'var(--le-gray-300)'
+                            }}
                             onClick={() => api?.scrollTo(idx)}
                           />
                         ))}

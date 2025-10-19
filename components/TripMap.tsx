@@ -204,54 +204,89 @@ export default function TripMap({ itinerary, selectedLocation, hoveredLocation }
   return (
     <div className="relative w-full h-full">
       {/* Map Controls */}
-      <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
-        <div className="bg-white rounded-lg shadow-lg p-2">
-          <button
-            onClick={() => setShowRoutes(!showRoutes)}
-            className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded transition-colors ${
-              showRoutes ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
-            Routes
-          </button>
-        </div>
-        <div className="bg-white rounded-lg shadow-lg p-2">
-          <button
-            onClick={() => setShowLegend(!showLegend)}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Legend
-          </button>
-        </div>
+      <div className="absolute top-4 right-4 z-[40] flex flex-col gap-2">
+        <button
+          onClick={() => setShowRoutes(!showRoutes)}
+          className="le-button-primary flex items-center gap-2"
+          style={{
+            fontSize: 'var(--le-text-xs)',
+            padding: 'var(--le-space-2) var(--le-space-3)',
+            background: showRoutes ? 'var(--le-charcoal)' : 'var(--le-white)',
+            color: showRoutes ? 'var(--le-white)' : 'var(--le-charcoal)',
+            border: showRoutes ? 'none' : '1px solid var(--le-gray-300)',
+            boxShadow: 'var(--le-shadow-md)',
+          }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          Routes
+        </button>
+        <button
+          onClick={() => setShowLegend(!showLegend)}
+          className="le-button-primary flex items-center gap-2"
+          style={{
+            fontSize: 'var(--le-text-xs)',
+            padding: 'var(--le-space-2) var(--le-space-3)',
+            background: showLegend ? 'var(--le-charcoal)' : 'var(--le-white)',
+            color: showLegend ? 'var(--le-white)' : 'var(--le-charcoal)',
+            border: showLegend ? 'none' : '1px solid var(--le-gray-300)',
+            boxShadow: 'var(--le-shadow-md)',
+          }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Legend
+        </button>
       </div>
 
       {/* Legend */}
       {showLegend && (
-        <div className="absolute top-4 left-4 z-[1000] bg-white rounded-lg shadow-lg p-4 max-w-xs">
-          <h3 className="font-bold text-sm text-gray-900 mb-3">Map Legend</h3>
-          <div className="space-y-2">
+        <div className="absolute top-4 left-4 z-[40] max-w-xs" style={{
+          background: 'var(--le-white)',
+          padding: 'var(--le-space-4)',
+          borderRadius: 'var(--le-radius-md)',
+          boxShadow: 'var(--le-shadow-lg)',
+          border: '1px solid var(--le-gray-200)'
+        }}>
+          <h3 style={{
+            fontSize: 'var(--le-text-sm)',
+            fontWeight: 'var(--le-font-bold)',
+            color: 'var(--le-gray-900)',
+            marginBottom: 'var(--le-space-3)'
+          }}>
+            Map Legend
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--le-space-2)' }}>
             {Object.entries(ACTIVITY_TYPE_COLORS).map(([type, config]) => (
               <div key={type} className="flex items-center gap-3">
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: config.primary }}
                 />
-                <span className="text-xs text-gray-700 flex items-center gap-1">
+                <span className="flex items-center gap-1" style={{
+                  fontSize: 'var(--le-text-xs)',
+                  color: 'var(--le-gray-700)'
+                }}>
                   <span>{config.icon}</span>
                   <span>{config.label}</span>
                 </span>
               </div>
             ))}
-            <div className="pt-2 border-t border-gray-200 mt-2">
+            <div style={{
+              paddingTop: 'var(--le-space-2)',
+              borderTop: '1px solid var(--le-gray-200)',
+              marginTop: 'var(--le-space-2)'
+            }}>
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full border-2 border-amber-400" />
-                <span className="text-xs text-gray-700">Modified Selection</span>
+                <span style={{
+                  fontSize: 'var(--le-text-xs)',
+                  color: 'var(--le-gray-700)'
+                }}>
+                  Modified Selection
+                </span>
               </div>
             </div>
           </div>
