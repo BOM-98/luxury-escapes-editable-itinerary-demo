@@ -8,6 +8,7 @@ import { DayItinerary, ActivityType } from '@/lib/types';
 interface TripMapProps {
   itinerary: DayItinerary[];
   selectedLocation?: [number, number];
+  hoveredLocation?: [number, number];
 }
 
 // Color scheme for activity types
@@ -58,7 +59,21 @@ function MapController({ center }: { center: [number, number] }) {
   return null;
 }
 
-export default function TripMap({ itinerary, selectedLocation }: TripMapProps) {
+// Component to fit map bounds to show all markers
+function FitBounds({ locations }: { locations: [number, number][] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (locations && locations.length > 0) {
+      const bounds = L.latLngBounds(locations);
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+    }
+  }, [locations, map]);
+
+  return null;
+}
+
+export default function TripMap({ itinerary, selectedLocation, hoveredLocation }: TripMapProps) {
   const [mounted, setMounted] = useState(false);
   const [showRoutes, setShowRoutes] = useState(true);
   const [showLegend, setShowLegend] = useState(true);
@@ -110,7 +125,29 @@ export default function TripMap({ itinerary, selectedLocation }: TripMapProps) {
       })
   );
 
-  // Create route lines between consecutive locations
+  // Handle duplicate coordinates by adding small offsets
+  const locationsWithOffsets = allLocations.map((location, index) => {
+    // Count how many previous locations have the same coordinates
+    const duplicatesBefore = allLocations.slice(0, index).filter(
+      loc => loc.coordinates[0] === location.coordinates[0] &&
+             loc.coordinates[1] === location.coordinates[1]
+    ).length;
+
+    if (duplicatesBefore > 0) {
+      // Add a small offset (0.002 degrees ≈ 222 meters)
+      const offset = 0.002 * duplicatesBefore;
+      return {
+        ...location,
+        coordinates: [
+          location.coordinates[0] + offset,
+          location.coordinates[1] + offset,
+        ] as [number, number],
+      };
+    }
+    return location;
+  });
+
+  // Create route lines between consecutive locations (using original coordinates for route calculation)
   const routes: Array<{ positions: [number, number][]; distance: number; time: string }> = [];
   for (let i = 0; i < allLocations.length - 1; i++) {
     const from = allLocations[i];
@@ -232,7 +269,14 @@ export default function TripMap({ itinerary, selectedLocation }: TripMapProps) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {selectedLocation && <MapController center={selectedLocation} />}
+        {/* Priority: hoveredLocation > selectedLocation > fit all bounds */}
+        {hoveredLocation ? (
+          <MapController center={hoveredLocation} />
+        ) : selectedLocation ? (
+          <MapController center={selectedLocation} />
+        ) : (
+          <FitBounds locations={locationsWithOffsets.map(loc => loc.coordinates)} />
+        )}
 
         {/* Route Lines */}
         {showRoutes && routes.map((route, index) => (
@@ -260,7 +304,7 @@ export default function TripMap({ itinerary, selectedLocation }: TripMapProps) {
         ))}
 
         {/* Markers for each location */}
-        {allLocations.map((location, index) => (
+        {locationsWithOffsets.map((location, index) => (
           <Marker
             key={`${location.title}-${index}`}
             position={location.coordinates}
@@ -353,7 +397,7 @@ export default function TripMap({ itinerary, selectedLocation }: TripMapProps) {
                 )}
 
                 {/* Distance to next location */}
-                {index < allLocations.length - 1 && routes[index] && (
+                {index < locationsWithOffsets.length - 1 && routes[index] && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
                     <div className="flex items-center gap-2 text-xs text-gray-600">
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -6,10 +6,11 @@ interface ActivityCardProps {
   activitySlot: ActivitySlot;
   onLocationClick?: (coordinates: [number, number]) => void;
   onSelectOption?: (activitySlotId: string, optionId: string) => void;
+  onActivityHover?: (coordinates: [number, number] | undefined) => void;
   itinerary: DayItinerary[];
 }
 
-export default function ActivityCard({ activitySlot, onLocationClick, onSelectOption, itinerary }: ActivityCardProps) {
+export default function ActivityCard({ activitySlot, onLocationClick, onSelectOption, onActivityHover, itinerary }: ActivityCardProps) {
   const [showOptionSelector, setShowOptionSelector] = useState(false);
   // Get the currently selected option
   const selectedOption = activitySlot.options.find(opt => opt.id === activitySlot.selectedOptionId);
@@ -20,14 +21,31 @@ export default function ActivityCard({ activitySlot, onLocationClick, onSelectOp
 
   if (!selectedOption) return null;
 
+  const handleMouseEnter = () => {
+    if (activitySlot.location && onActivityHover) {
+      onActivityHover(activitySlot.location.coordinates);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (onActivityHover) {
+      onActivityHover(undefined);
+    }
+  };
+
   return (
-    <div style={{
-      background: 'var(--le-white)',
-      borderBottom: '1px solid var(--le-gray-200)',
-      borderLeft: isModified ? '3px solid var(--le-primary)' : 'none',
-      padding: 'var(--le-space-4)',
-      opacity: isLocked ? '0.9' : '1',
-    }}>
+    <div
+      style={{
+        background: 'var(--le-white)',
+        borderBottom: '1px solid var(--le-gray-200)',
+        borderLeft: isModified ? '3px solid var(--le-primary)' : 'none',
+        padding: 'var(--le-space-4)',
+        opacity: isLocked ? '0.9' : '1',
+        transition: 'all 0.2s ease',
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* Header with badges */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2 flex-wrap">
@@ -87,6 +105,22 @@ export default function ActivityCard({ activitySlot, onLocationClick, onSelectOp
             </span>
           )}
         </div>
+
+        {/* Change Option button - top right */}
+        {hasMultipleOptions && !isLocked && (
+          <button
+            onClick={() => setShowOptionSelector(true)}
+            className="le-button-primary"
+            style={{
+              fontSize: 'var(--le-text-xs)',
+              padding: 'var(--le-space-2) var(--le-space-3)',
+              whiteSpace: 'nowrap',
+              flexShrink: 0
+            }}
+          >
+            Change Option ({activitySlot.options.length})
+          </button>
+        )}
       </div>
 
       {/* Title & Description */}
@@ -174,53 +208,16 @@ export default function ActivityCard({ activitySlot, onLocationClick, onSelectOp
       )}
 
       {/* Actions */}
-      <div className="flex items-center justify-between gap-3 le-divider" style={{
+      <div className="flex items-center gap-3 le-divider" style={{
         paddingTop: 'var(--le-space-3)',
         borderTop: '1px solid'
       }}>
-        <div className="flex items-center gap-3">
-          {activitySlot.location && (
-            <button
-              onClick={() => onLocationClick?.(activitySlot.location!.coordinates)}
-              className="flex items-center gap-1.5"
-              style={{
-                fontSize: 'var(--le-text-xs)',
-                color: 'var(--le-primary)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'color var(--le-transition-base)'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--le-primary-dark)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--le-primary)'}
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>{activitySlot.location.name}</span>
-            </button>
-          )}
-
-          {selectedOption.supplier && (
-            <div className="flex items-center gap-1" style={{
-              fontSize: 'var(--le-text-xs)',
-              color: 'var(--le-gray-500)'
-            }}>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
-              <span>{selectedOption.supplier.rating} • {selectedOption.supplier.name}</span>
-            </div>
-          )}
-        </div>
-
-        {hasMultipleOptions && !isLocked && (
+        {activitySlot.location && (
           <button
-            onClick={() => setShowOptionSelector(true)}
+            onClick={() => onLocationClick?.(activitySlot.location!.coordinates)}
+            className="flex items-center gap-1.5"
             style={{
               fontSize: 'var(--le-text-xs)',
-              fontWeight: 'var(--le-font-medium)',
               color: 'var(--le-primary)',
               background: 'transparent',
               border: 'none',
@@ -230,8 +227,24 @@ export default function ActivityCard({ activitySlot, onLocationClick, onSelectOp
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--le-primary-dark)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--le-primary)'}
           >
-            Change Option ({activitySlot.options.length})
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>{activitySlot.location.name}</span>
           </button>
+        )}
+
+        {selectedOption.supplier && (
+          <div className="flex items-center gap-1" style={{
+            fontSize: 'var(--le-text-xs)',
+            color: 'var(--le-gray-500)'
+          }}>
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+            <span>{selectedOption.supplier.rating} • {selectedOption.supplier.name}</span>
+          </div>
         )}
       </div>
 

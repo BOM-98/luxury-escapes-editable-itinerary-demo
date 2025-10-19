@@ -6,9 +6,10 @@ interface ItinerarySidebarProps {
   itinerary: DayItinerary[];
   onLocationClick?: (coordinates: [number, number]) => void;
   onSelectOption?: (activitySlotId: string, optionId: string) => void;
+  onActivityHover?: (coordinates: [number, number] | undefined) => void;
 }
 
-export default function ItinerarySidebar({ itinerary, onLocationClick, onSelectOption }: ItinerarySidebarProps) {
+export default function ItinerarySidebar({ itinerary, onLocationClick, onSelectOption, onActivityHover }: ItinerarySidebarProps) {
   return (
     <div className="w-full h-full overflow-y-auto border-r" style={{
       background: 'var(--le-white)',
@@ -20,6 +21,7 @@ export default function ItinerarySidebar({ itinerary, onLocationClick, onSelectO
           day={day}
           onLocationClick={onLocationClick}
           onSelectOption={onSelectOption}
+          onActivityHover={onActivityHover}
           fullItinerary={itinerary}
         />
       ))}

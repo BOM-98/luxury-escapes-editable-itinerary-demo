@@ -6,10 +6,11 @@ interface DaySectionProps {
   day: DayItinerary;
   onLocationClick?: (coordinates: [number, number]) => void;
   onSelectOption?: (activitySlotId: string, optionId: string) => void;
+  onActivityHover?: (coordinates: [number, number] | undefined) => void;
   fullItinerary: DayItinerary[];
 }
 
-export default function DaySection({ day, onLocationClick, onSelectOption, fullItinerary }: DaySectionProps) {
+export default function DaySection({ day, onLocationClick, onSelectOption, onActivityHover, fullItinerary }: DaySectionProps) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -51,6 +52,7 @@ export default function DaySection({ day, onLocationClick, onSelectOption, fullI
             activitySlot={activitySlot}
             onLocationClick={onLocationClick}
             onSelectOption={onSelectOption}
+            onActivityHover={onActivityHover}
             itinerary={fullItinerary}
           />
         ))}

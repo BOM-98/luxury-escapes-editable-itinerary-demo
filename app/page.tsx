@@ -26,6 +26,7 @@ const TripMap = dynamic(() => import('@/components/TripMap'), {
 
 export default function Home() {
   const [selectedLocation, setSelectedLocation] = useState<[number, number] | undefined>();
+  const [hoveredLocation, setHoveredLocation] = useState<[number, number] | undefined>();
   const [itinerary, setItinerary] = useState<DayItinerary[]>(mockTrip.itinerary);
   const [showSendToAgent, setShowSendToAgent] = useState(false);
   const [agentRequests, setAgentRequests] = useState<AgentRequest[]>([]);
@@ -37,6 +38,10 @@ export default function Home() {
 
   const handleLocationClick = (coordinates: [number, number]) => {
     setSelectedLocation(coordinates);
+  };
+
+  const handleActivityHover = (coordinates: [number, number] | undefined) => {
+    setHoveredLocation(coordinates);
   };
 
   const handleSelectOption = (activitySlotId: string, optionId: string) => {
@@ -158,6 +163,7 @@ export default function Home() {
             itinerary={itinerary}
             onLocationClick={handleLocationClick}
             onSelectOption={handleSelectOption}
+            onActivityHover={handleActivityHover}
           />
         </ResizablePanel>
 
@@ -169,6 +175,7 @@ export default function Home() {
             <TripMap
               itinerary={itinerary}
               selectedLocation={selectedLocation}
+              hoveredLocation={hoveredLocation}
             />
           </div>
         </ResizablePanel>
